@@ -1,5 +1,7 @@
 [build]
-  functions = "functions"
+  command = "npm run build" # Ou "npm install" caso não tenha build
+  publish = "." # Diretório de publicação
+  functions = "functions"  # Diretório das funções Lambda
 
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"
