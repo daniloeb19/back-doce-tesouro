@@ -1,5 +1,5 @@
 [build]
-  command = "npm run build" # Ou "npm install" caso não tenha build
+  command = "npm install" # Ou "npm install" caso não tenha build
   publish = "." # Diretório de publicação
   functions = "functions"  # Diretório das funções Lambda
 
