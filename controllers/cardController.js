@@ -1,18 +1,27 @@
 const Card = require('../models/Card');
 const path = require('path');
+const cloudinary = require('../config/cloudinary');
 
-// Função para criar um novo card
 const createCard = async (req, res) => {
-    const imagePath = req.file ? path.join('uploads', req.file.filename) : null;  // Caminho da imagem no servidor
+    let imagePath = null;
 
-    // Verifique se a imagem foi realmente enviada
-    if (!imagePath) {
+    // Verifique se a imagem foi enviada e faça o upload para o Cloudinary
+    if (req.file) {
+        try {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'cards',
+            });
+            imagePath = result.secure_url; // URL segura da imagem na nuvem
+        } catch (err) {
+            return res.status(500).json({ message: 'Erro ao fazer upload da imagem.' });
+        }
+    } else {
         return res.status(400).json({ message: "Imagem é obrigatória" });
     }
 
     const newCard = new Card({
         ...req.body,
-        image: imagePath,  // Salva o caminho da imagem
+        image: imagePath,  // Salva o URL da imagem no banco
     });
 
     try {
@@ -26,7 +35,19 @@ const createCard = async (req, res) => {
 // Função para atualizar um card existente
 const updateCard = async (req, res) => {
     const { title, description, longDescription, price } = req.body;
-    const imagePath = req.file ? path.join('uploads', req.file.filename) : null;
+    let imagePath = null;
+
+    // Verifique se uma nova imagem foi enviada
+    if (req.file) {
+        try {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'cards',
+            });
+            imagePath = result.secure_url; // URL da nova imagem
+        } catch (err) {
+            return res.status(500).json({ message: 'Erro ao fazer upload da imagem.' });
+        }
+    }
 
     try {
         const updatedCard = await Card.findByIdAndUpdate(
@@ -36,11 +57,11 @@ const updateCard = async (req, res) => {
                 description,
                 longDescription,
                 price,
-                image: imagePath,  // Atualiza o caminho da imagem
+                ...(imagePath && { image: imagePath }), // Atualiza a imagem apenas se houver nova
             },
             { new: true }
         );
-        res.json(updatedCard);  // Retorna o card atualizado
+        res.json(updatedCard);
     } catch (err) {
         res.status(400).json({ message: err.message });
     }

@@ -5,27 +5,13 @@ const authenticateToken = require('../middleware/jwt');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const uploadPath = path.join(__dirname, '..', 'uploads');
 
-// Verifica se a pasta existe, caso contrário, cria a pasta
-if (!fs.existsSync(uploadPath)) {
-    fs.mkdirSync(uploadPath, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');  // Pasta onde as imagens serão salvas
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));  // Nome único para cada imagem
-    }
-});
-
-const upload = multer({ storage: storage });
+// Configuração temporária do multer (arquivos serão apagados após upload no Cloudinary)
+const upload = multer({ dest: 'uploads/' });
 
 router.get('/', cardController.getCards);
-router.post('/', authenticateToken, upload.single('image'), cardController.createCard);  // Rota para criar card com upload de imagem
-router.put('/:id', authenticateToken, upload.single('image'), cardController.updateCard);  // Rota para atualizar card com upload de imagem
+router.post('/', authenticateToken, upload.single('image'), cardController.createCard);  // Cria card com imagem
+router.put('/:id', authenticateToken, upload.single('image'), cardController.updateCard);  // Atualiza card com imagem
 router.delete('/:id', authenticateToken, cardController.deleteCard);
 
 module.exports = router;
