@@ -12,7 +12,6 @@ const app = express();
 // Middlewares
 app.use(cors());
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Conexão com o MongoDB
 mongoose.connect(process.env.MONGO_URI)
