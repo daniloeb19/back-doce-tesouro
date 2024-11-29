@@ -3,7 +3,7 @@ const cloudinary = require('../config/cloudinary');
 
 const createCard = async (req, res) => {
     let imagePath = null;
-
+    console.log(JSON.stringify(req.body))
     // Verifique se a imagem foi enviada e faça o upload para o Cloudinary
     if (req.body.image) {
         try {
