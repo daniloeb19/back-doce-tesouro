@@ -1,14 +1,14 @@
 const Card = require('../models/Card');
-const path = require('path');
 const cloudinary = require('../config/cloudinary');
 
 const createCard = async (req, res) => {
     let imagePath = null;
 
     // Verifique se a imagem foi enviada e faça o upload para o Cloudinary
-    if (req.file) {
+    if (req.body.image) {
         try {
-            const result = await cloudinary.uploader.upload(req.file.path, {
+            // O arquivo de imagem é enviado como base64 ou URL pelo cliente
+            const result = await cloudinary.uploader.upload(req.body.image, {
                 folder: 'cards',
             });
             imagePath = result.secure_url; // URL segura da imagem na nuvem
@@ -32,15 +32,16 @@ const createCard = async (req, res) => {
     }
 };
 
-// Função para atualizar um card existente
+
 const updateCard = async (req, res) => {
     const { title, description, longDescription, price } = req.body;
     let imagePath = null;
 
     // Verifique se uma nova imagem foi enviada
-    if (req.file) {
+    if (req.body.image) {
         try {
-            const result = await cloudinary.uploader.upload(req.file.path, {
+            // O arquivo de imagem é enviado como base64 ou URL pelo cliente
+            const result = await cloudinary.uploader.upload(req.body.image, {
                 folder: 'cards',
             });
             imagePath = result.secure_url; // URL da nova imagem
@@ -66,6 +67,7 @@ const updateCard = async (req, res) => {
         res.status(400).json({ message: err.message });
     }
 };
+
 
 // Função para deletar um card
 const deleteCard = async (req, res) => {
